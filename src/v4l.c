@@ -2,7 +2,7 @@
  *  video4linux Xv Driver 
  *  based on Michael Schimek's permedia 2 driver.
  */
-/* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.32 2003/09/24 02:43:30 dawes Exp $ */
+/* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.33 2003/12/05 03:55:32 dawes Exp $ */
 
 #include "videodev.h"
 #include "xf86.h"
@@ -718,11 +718,11 @@ static void
 V4LBuildEncodings(PortPrivPtr p, int fd, int channels)
 {
     static struct video_channel     channel;
-    int i,entries,have_bttv;
+    int i,entries,have_bttv,bttv_ver;
 
 #define BTTV_VERSION _IOR('v' , BASE_VIDIOCPRIVATE+6, int)
     have_bttv = 0;
-    if (-1 != ioctl(fd,BTTV_VERSION,NULL))
+    if (-1 != ioctl(fd,BTTV_VERSION,&bttv_ver))
 	have_bttv = 1;
 	
     entries = (have_bttv ? 7 : 3) * channels;
