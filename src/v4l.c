@@ -2,7 +2,7 @@
  *  video4linux Xv Driver 
  *  based on Michael Schimek's permedia 2 driver.
  */
-/* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.30 2002/05/14 20:19:53 alanh Exp $ */
+/* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.32 2003/09/24 02:43:30 dawes Exp $ */
 
 #include "videodev.h"
 #include "xf86.h"
@@ -13,7 +13,7 @@
 #include "xf86fbman.h"
 #include "xf86xv.h"
 #include "Xv.h"
-#include "miscstruct.h"
+#include "regionstr.h"
 #include "dgaproc.h"
 #include "xf86str.h"
 
@@ -220,7 +220,7 @@ static int V4lOpenDevice(PortPrivPtr pPPriv, ScrnInfoPtr pScrn)
 	if (first) {
 	    first = 0;
 	    xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
-			 "v4l: memPhysBase=%p\n", pScrn->memPhysBase);
+			 "v4l: memPhysBase=0x%lx\n", pScrn->memPhysBase);
 	}
 
 	switch (pScrn->bitsPerPixel) {
