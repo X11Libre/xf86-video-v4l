@@ -50,7 +50,7 @@ static XF86ModuleVersionInfo v4lVersRec =
         MODULEVENDORSTRING,
         MODINFOSTRING1,
         MODINFOSTRING2,
-        XF86_VERSION_CURRENT,
+        XORG_VERSION_CURRENT,
         0, 0, 1,
         ABI_CLASS_VIDEODRV,
         ABI_VIDEODRV_VERSION,
