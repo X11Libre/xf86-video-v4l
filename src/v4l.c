@@ -2,7 +2,7 @@
  *  video4linux Xv Driver 
  *  based on Michael Schimek's permedia 2 driver.
  */
-/* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.34 2003/12/31 06:08:53 dawes Exp $ */
+/* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.33 2003/12/05 03:55:32 dawes Exp $ */
 
 #include "videodev.h"
 #include "xf86.h"
@@ -50,7 +50,7 @@ static XF86ModuleVersionInfo v4lVersRec =
         MODULEVENDORSTRING,
         MODINFOSTRING1,
         MODINFOSTRING2,
-        XF86_VERSION_CURRENT,
+        XORG_VERSION_CURRENT,
         0, 0, 1,
         ABI_CLASS_VIDEODRV,
         ABI_VIDEODRV_VERSION,
