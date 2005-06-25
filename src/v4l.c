@@ -29,7 +29,7 @@ static void     V4LIdentify(int flags);
 static Bool     V4LProbe(DriverPtr drv, int flags);
 static const OptionInfoRec * V4LAvailableOptions(int chipid, int busid);
 
-DriverRec V4L = {
+_X_EXPORT DriverRec V4L = {
         40000,
         "v4l",
         V4LIdentify, /* Identify*/
@@ -58,7 +58,7 @@ static XF86ModuleVersionInfo v4lVersRec =
         {0,0,0,0}
 };
 
-XF86ModuleData v4lModuleData = { &v4lVersRec, v4lSetup, NULL };
+_X_EXPORT XF86ModuleData v4lModuleData = { &v4lVersRec, v4lSetup, NULL };
 
 static pointer
 v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
