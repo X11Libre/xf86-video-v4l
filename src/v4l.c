@@ -4,6 +4,10 @@
  */
 /* $XFree86: xc/programs/Xserver/hw/xfree86/drivers/v4l/v4l.c,v 1.33 2003/12/05 03:55:32 dawes Exp $ */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "videodev.h"
 #include "xf86.h"
 #include "xf86_OSproc.h"
