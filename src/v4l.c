@@ -279,7 +279,7 @@ static int
 V4lPutVideo(ScrnInfoPtr pScrn,
     short vid_x, short vid_y, short drw_x, short drw_y,
     short vid_w, short vid_h, short drw_w, short drw_h,
-    RegionPtr clipBoxes, pointer data)
+    RegionPtr clipBoxes, pointer data, DrawablePtr pDraw)
 {
     PortPrivPtr pPPriv = (PortPrivPtr) data;
     struct video_clip *clip;
@@ -474,7 +474,7 @@ static int
 V4lPutStill(ScrnInfoPtr pScrn,
     short vid_x, short vid_y, short drw_x, short drw_y,
     short vid_w, short vid_h, short drw_w, short drw_h,
-    RegionPtr clipBoxes, pointer data)
+    RegionPtr clipBoxes, pointer data, DrawablePtr pDraw)
 {
 #if 0
     PortPrivPtr pPPriv = (PortPrivPtr) data;  
