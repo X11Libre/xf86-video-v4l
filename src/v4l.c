@@ -8,10 +8,16 @@
 #include "config.h"
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+
 #include "videodev.h"
 #include "xf86.h"
 #include "xf86_OSproc.h"
-#include "xf86_ansic.h"
 #include "xf86Pci.h"
 #include "xf86PciInfo.h"
 #include "xf86fbman.h"
@@ -55,7 +61,7 @@ static XF86ModuleVersionInfo v4lVersRec =
         MODINFOSTRING1,
         MODINFOSTRING2,
         XORG_VERSION_CURRENT,
-        0, 0, 1,
+        0, 1, 0,
         ABI_CLASS_VIDEODRV,
         ABI_VIDEODRV_VERSION,
         MOD_CLASS_NONE,
