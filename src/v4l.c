@@ -592,7 +592,8 @@ V4lSetPortAttribute(ScrnInfoPtr pScrn,
 	    if (-1 == ioctl(V4L_FD,VIDIOCSAUDIO,&pPPriv->audio))
 		perror("ioctl VIDIOCSAUDIO");
     } else if (attribute == xvFreq) {
-	if (-1 == ioctl(V4L_FD,VIDIOCSFREQ,&value))
+	unsigned long freq = value;
+	if (-1 == ioctl(V4L_FD,VIDIOCSFREQ,&freq))
 	    perror("ioctl VIDIOCSFREQ");
     } else if (0 != pPPriv->yuv_format &&
 	       pPPriv->myfmt->setAttribute) {
@@ -644,7 +645,9 @@ V4lGetPortAttribute(ScrnInfoPtr pScrn,
 	    ret = BadValue;
 	}
     } else if (attribute == xvFreq) {
-	ioctl(V4L_FD,VIDIOCGFREQ,value);
+	unsigned long freq;
+	ioctl(V4L_FD,VIDIOCGFREQ,&freq);
+	*value = freq;
     } else if (0 != pPPriv->yuv_format &&
 	       pPPriv->myfmt->getAttribute) {
 	/* not mine -> pass to yuv scaler driver */
