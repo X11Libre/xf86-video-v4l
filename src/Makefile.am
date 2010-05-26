@@ -28,7 +28,6 @@ v4l_drv_la_LTLIBRARIES = v4l_drv.la
 v4l_drv_la_LDFLAGS = -module -avoid-version
 v4l_drv_ladir = @moduledir@/drivers
 
-v4l_drv_la_SOURCES = \
-         v4l.c
-
-EXTRA_DIST = videodev.h
+v4l_drv_la_SOURCES =	\
+	v4l.c		\
+	videodev.h
