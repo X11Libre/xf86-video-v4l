@@ -61,8 +61,6 @@ PKG_CHECK_MODULES(XORG, [xorg-server >= 1.0.99.901 xproto $REQUIRED_MODULES])
 
 # Checks for libraries.
 
-# Checks for header files.
-AC_HEADER_STDC
 
 AC_SUBST([XORG_CFLAGS])
 AC_SUBST([moduledir])
