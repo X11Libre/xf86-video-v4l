@@ -992,7 +992,6 @@ V4LBuildEncodings(PortPrivPtr p, int fd)
      */
     for (inp = 0; inp < 256; inp++) {
         struct v4l2_input       input;
-        struct v4l2_framebuffer fbuf;
 
         memset(&input, 0, sizeof(input));
         input.index = inp;
@@ -1001,6 +1000,14 @@ V4LBuildEncodings(PortPrivPtr p, int fd)
 
         for (std = 0; std < num_std; std++) {
             int width, height;
+
+	    /*
+	     * Currently, this code is not reliable, due to driver
+	     * non-compliance on both saa7134 and bttv. So, instead,
+	     * just use the video standard information
+	     */
+#if 0
+	    struct v4l2_framebuffer fbuf;
 
             /* Some webcam drivers will fail here, but that's OK */
             ioctl(fd, VIDIOC_S_STD, &p->standard[std].id);
@@ -1035,7 +1042,16 @@ V4LBuildEncodings(PortPrivPtr p, int fd)
                     width = format.fmt.pix.width;
                 }
             }
+#else
+	    if (p->standard[std].id & V4L2_STD_525_60) {
+		height = 480;
+		width = 640;
+	    } else {
+		height = 576;
+		width = 768;
+	    }
 
+#endif
             /* Fixup for some driver bug */
             if ((p->standard[std].id & V4L2_STD_525_60) && (height == 576))
                 height = 480;
