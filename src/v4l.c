@@ -32,6 +32,7 @@
 #include "regionstr.h"
 #include "dgaproc.h"
 #include "xf86str.h"
+#include "fourcc.h"
 
 #include <asm/ioctl.h>          /* _IORW(xxx) #defines are here */
 
@@ -345,19 +346,6 @@ static void AddAllV4LControls(PortPrivPtr p, XF86AttributeRec **list,
 }
 
 /* ---------------------------------------------------------------------- */
-
-/*
- * From: hw/xfree86/common/fourcc.h
- *
- * FIXME: Are they the same codes as the V4L fourcc? It would be better
- * to include a header with them.
- */
-#define FOURCC_YUY2 0x32595559
-#define FOURCC_YV12 0x32315659
-#define FOURCC_I420 0x30323449
-#define FOURCC_UYVY 0x59565955
-#define FOURCC_IA44 0x34344149
-#define FOURCC_AI44 0x34344941
 
 /* setup yuv overlay + hw scaling: look if we find some common video
    format which both v4l driver and the X-Server can handle */
