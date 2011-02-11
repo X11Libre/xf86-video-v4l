@@ -790,6 +790,8 @@ V4lSetPortAttribute(ScrnInfoPtr pScrn,
             /* not mine -> pass to yuv scaler driver */
             if (0 != pPPriv->yuv_format && pPPriv->myfmt->setAttribute)
                 ret = pPPriv->myfmt->setAttribute(pScrn, attribute, value);
+            else
+                ret = BadMatch;
             goto err;
         }
         if (pPPriv->XvV4LCtrl[i].qctrl.flags & V4L2_CTRL_FLAG_DISABLED)
@@ -839,6 +841,8 @@ V4lGetPortAttribute(ScrnInfoPtr pScrn,
             /* not mine -> pass to yuv scaler driver */
             if (0 != pPPriv->yuv_format &&  pPPriv->myfmt->getAttribute)
                 ret = pPPriv->myfmt->getAttribute(pScrn, attribute, value);
+            else
+                ret = BadMatch;
             goto err;
         }
         if (pPPriv->XvV4LCtrl[i].qctrl.flags & V4L2_CTRL_FLAG_DISABLED)
