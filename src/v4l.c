@@ -212,6 +212,7 @@ static struct V4L_DEVICE {
 static int SetV4LFmt(int fd, CARD32 pixelformat)
 {
     struct v4l2_framebuffer fbuf;
+    char *p = (char *)&pixelformat;
 
     memset(&fbuf, 0, sizeof(fbuf));
     if (ioctl(fd, VIDIOC_G_FBUF, &fbuf) == -1) {
@@ -221,10 +222,13 @@ static int SetV4LFmt(int fd, CARD32 pixelformat)
     if (fbuf.fmt.pixelformat != pixelformat) {
         fbuf.fmt.pixelformat = pixelformat;
         if (ioctl(fd, VIDIOC_S_FBUF, &fbuf) == -1) {
-            xf86Msg(X_ERROR, "v4l: Error %d: Can't set FBUF\n", errno);
+            xf86Msg(X_ERROR, "v4l: Error %d: Can't set FBUF to %c%c%c%c\n",
+                    errno, p[0], p[1], p[2], p[3]);
             return errno;
         }
     }
+    DEBUG(xf86Msg(X_INFO, "v4l: Set overlay format to %c%c%c%c\n",
+                  p[0], p[1], p[2], p[3]));
     return 0;
 }
 static int GetV4LFmt(int fd, CARD32 *pixelformat)
