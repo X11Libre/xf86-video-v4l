@@ -351,7 +351,7 @@ static void AddAllV4LControls(PortPrivPtr p, XF86AttributeRec **list,
 
 /* setup yuv overlay + hw scaling: look if we find some common video
    format which both v4l driver and the X-Server can handle */
-static void v4l_check_yuv(ScrnInfoPtr pScrn, PortPrivPtr pPPriv,
+static int v4l_check_yuv(ScrnInfoPtr pScrn, PortPrivPtr pPPriv,
                           char *dev, int fd)
 {
     static const struct {
@@ -371,7 +371,7 @@ static void v4l_check_yuv(ScrnInfoPtr pScrn, PortPrivPtr pPPriv,
     xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
                    "v4l: Number of Xv formats: %d\n", pPPriv->nformat);
     if (!pPPriv->nformat)
-        return;
+        return FALSE;
 
     for (fmt = 0; yuvlist[fmt].v4l_palette != 0; fmt++) {
         pPPriv->pixelformat = yuvlist[fmt].v4l_palette;
@@ -390,11 +390,11 @@ static void v4l_check_yuv(ScrnInfoPtr pScrn, PortPrivPtr pPPriv,
                 xf86DrvMsg(pScrn->scrnIndex, X_INFO,
                            "v4l[%s]: using hw video scaling [%4.4s].\n",
                            dev,(char*)&(pPPriv->format[i].image->id));
-                return;
+                return TRUE;
             }
         }
     }
-    return;
+    return TRUE;
 }
 
 static int V4lOpenDevice(PortPrivPtr pPPriv, ScrnInfoPtr pScrn)
@@ -1144,7 +1144,15 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
             continue;
         }
 
-        xf86Msg(X_INFO,  "v4l: %s device supports overlay mode.\n",dev);
+        if (v4l_check_yuv(pScrn, pPPriv, dev, fd) == FALSE) {
+                xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
+                               "Xv Overlay not supported. Can't use v4l driver\n");
+                free(pPPriv);
+                close(fd);
+                continue;
+        }
+
+        xf86Msg(X_INFO, "v4l: enabling overlay mode for %s.\n", dev);
         strncpy(V4L_NAME, dev, 16);
         V4LBuildEncodings(pPPriv, fd);
         if (NULL == pPPriv->enc)
@@ -1172,7 +1180,6 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
         }
 
         /* Initialize yuv_format */
-        v4l_check_yuv(pScrn, pPPriv, V4L_NAME, V4L_FD);
         if (0 != pPPriv->yuv_format) {
             /* pass throuth scaler attributes */
             for (j = 0; j < pPPriv->myfmt->num_attributes; j++) {
