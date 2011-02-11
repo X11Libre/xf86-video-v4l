@@ -125,7 +125,6 @@ v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
 typedef struct _XvV4LCtrlRec {
     struct v4l2_queryctrl       qctrl;
     Atom                        xv;
-    INT32                       min, max;
 } XvV4LCtrlRec, *XvV4LCtrlPtr;
 
 typedef struct _PortPrivRec {
@@ -300,12 +299,11 @@ static int AddControl(PortPrivPtr p, XF86AttributeRec **list, int *count,
 
     p->XvV4LCtrl[*n].xv = MAKE_ATOM((*list)[*count].name);
     memcpy(&p->XvV4LCtrl[*n].qctrl, qctrl, sizeof(*qctrl));
-    p->XvV4LCtrl[*n].min = (qctrl->minimum < -1000) ? -1000 : qctrl->minimum;
-    p->XvV4LCtrl[*n].max =  (qctrl->maximum > 1000) ?  1000 : qctrl->maximum;
 
     xf86Msg(X_INFO, "v4l: add attr %s (Xv/GPA %d) (%d to %d)\n",
             (*list)[*count].name, (int)p->XvV4LCtrl[*n].xv,
-            p->XvV4LCtrl[*n].min, p->XvV4LCtrl[*n].max);
+            p->XvV4LCtrl[*n].qctrl.minimum,
+            p->XvV4LCtrl[*n].qctrl.maximum);
 
     (*count)++;
     (*n)++;
@@ -746,48 +744,13 @@ V4lStopVideo(ScrnInfoPtr pScrn, pointer data, Bool shutdown)
     }
 }
 
-/* v4l uses range 0 - 65535; Xv uses -1000 - 1000 */
-static int
-v4l_to_xv(int val, XvV4LCtrlPtr XvV4LCtrl) {
-    int b = XvV4LCtrl->min - XvV4LCtrl->qctrl.minimum *
-            (XvV4LCtrl->max - XvV4LCtrl->min)
-            / (XvV4LCtrl->qctrl.maximum - XvV4LCtrl->qctrl.minimum);
-
-    val = val * (XvV4LCtrl->max - XvV4LCtrl->min)
-              / (XvV4LCtrl->qctrl.maximum - XvV4LCtrl->qctrl.minimum)
-              + b;
-
-    if (val < -1000)
-        val = -1000;
-    if (val >  1000)
-        val =  1000;
-    return val;
-}
-
-static int
-xv_to_v4l(int val, XvV4LCtrlPtr XvV4LCtrl) {
-    int b = XvV4LCtrl->qctrl.minimum - XvV4LCtrl->min *
-            ((XvV4LCtrl->qctrl.maximum - XvV4LCtrl->qctrl.minimum)
-            / (XvV4LCtrl->max - XvV4LCtrl->min));
-
-    val = val * (XvV4LCtrl->qctrl.maximum - XvV4LCtrl->qctrl.minimum)
-              / (XvV4LCtrl->max - XvV4LCtrl->min)
-              + b;
-
-    if (val < XvV4LCtrl->qctrl.minimum)
-        val = XvV4LCtrl->qctrl.minimum;
-    if (val > XvV4LCtrl->qctrl.maximum)
-        val = XvV4LCtrl->qctrl.maximum;
-    return val;
-}
-
 static int
 V4lSetPortAttribute(ScrnInfoPtr pScrn,
     Atom attribute, INT32 value, pointer data)
 {
     struct v4l2_control ctrl;
     PortPrivPtr pPPriv = (PortPrivPtr) data;
-    int i, ret = Success;
+    int i, ret = BadValue;
 
     if (V4lOpenDevice(pPPriv, pScrn))
         return Success;
@@ -798,52 +761,43 @@ V4lSetPortAttribute(ScrnInfoPtr pScrn,
     if (-1 == V4L_FD) {
         ret = Success;
     } else if (attribute == xvEncoding) {
-        if (value < 0 || value >= pPPriv->nenc) {
-            ret = BadValue;
+        if (value < 0 || value >= pPPriv->nenc)
             goto err;
-        }
         if (ioctl(V4L_FD, VIDIOC_S_INPUT, &pPPriv->input[value]) == -1) {
             xf86Msg(X_ERROR, "v4l: Error %d while setting input\n", errno);
-            ret = BadValue;
             goto err;
         }
         if (ioctl(V4L_FD, VIDIOC_S_STD, &pPPriv->norm[value]) == -1) {
             xf86Msg(X_ERROR, "v4l: Error %d while setting standard\n", errno);
-            ret = BadValue;
             goto err;
         }
         pPPriv->cenc = value;
+        ret = Success;
     } else if (attribute == xvFreq) {
         struct v4l2_frequency   freq;
         memset(&freq, 0, sizeof(freq));
-
         ioctl(V4L_FD, VIDIOC_G_FREQUENCY, &freq);
         freq.frequency = value;
-        if (ioctl(V4L_FD, VIDIOC_S_FREQUENCY, &freq) == -1) {
+        if (ioctl(V4L_FD, VIDIOC_S_FREQUENCY, &freq) == -1)
             xf86Msg(X_ERROR, "v4l: Error %d while setting frequency\n", errno);
-            ret = BadValue;
-            goto err;
-        }
-    } else if (0 != pPPriv->yuv_format && pPPriv->myfmt->setAttribute) {
-        /* not mine -> pass to yuv scaler driver */
-        ret = pPPriv->myfmt->setAttribute(pScrn, attribute, value);
+        else
+            ret = Success;
     } else {
         for (i = 0; i < pPPriv->n_qctrl; i++)
             if (pPPriv->XvV4LCtrl[i].xv == attribute)
                 break;
         if (i == pPPriv->n_qctrl) {
-            ret = BadValue;
+            /* not mine -> pass to yuv scaler driver */
+            if (0 != pPPriv->yuv_format && pPPriv->myfmt->setAttribute)
+                ret = pPPriv->myfmt->setAttribute(pScrn, attribute, value);
             goto err;
         }
-
-        if ((pPPriv->XvV4LCtrl[i].qctrl.flags & V4L2_CTRL_FLAG_DISABLED)) {
-            ret = BadValue;
+        if (pPPriv->XvV4LCtrl[i].qctrl.flags & V4L2_CTRL_FLAG_DISABLED)
             goto err;
-        }
         ctrl.id = pPPriv->XvV4LCtrl[i].qctrl.id;
-        ctrl.value = xv_to_v4l(value, &pPPriv->XvV4LCtrl[i]);
-        if (ioctl(V4L_FD, VIDIOC_S_CTRL, &ctrl))
-            ret = BadValue;
+        ctrl.value = value;
+        if (ioctl(V4L_FD, VIDIOC_S_CTRL, &ctrl) != 1)
+            ret = Success;
     }
 
 err:
@@ -857,49 +811,44 @@ V4lGetPortAttribute(ScrnInfoPtr pScrn,
 {
     struct v4l2_control ctrl;
     PortPrivPtr pPPriv = (PortPrivPtr) data;
-    int i, ret = Success;
+    int i, ret = BadValue;
 
     if (V4lOpenDevice(pPPriv, pScrn))
         return Success;
 
     DEBUG(xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2, "Xv/GPA %d\n",
-                         (int)attribute));
+                        (int)attribute));
 
     if (-1 == V4L_FD) {
         ret = Success;
     } else if (attribute == xvEncoding) {
         *value = pPPriv->cenc;
+        ret = Success;
     } else if (attribute == xvFreq) {
         struct v4l2_frequency   freq;
         memset(&freq, 0, sizeof(freq));
-
-        if (ioctl(V4L_FD, VIDIOC_G_FREQUENCY, &freq) == -1)
-            ret = BadValue;
-        else
+        if (ioctl(V4L_FD, VIDIOC_G_FREQUENCY, &freq) != -1) {
             *value = freq.frequency;
-    } else if (0 != pPPriv->yuv_format &&
-               pPPriv->myfmt->getAttribute) {
-        /* not mine -> pass to yuv scaler driver */
-        ret = pPPriv->myfmt->getAttribute(pScrn, attribute, value);
+            ret = Success;
+        }
     } else {
         for (i = 0; i < pPPriv->n_qctrl; i++)
             if (pPPriv->XvV4LCtrl[i].xv == attribute)
                 break;
         if (i == pPPriv->n_qctrl) {
-            ret = BadValue;
+            /* not mine -> pass to yuv scaler driver */
+            if (0 != pPPriv->yuv_format &&  pPPriv->myfmt->getAttribute)
+                ret = pPPriv->myfmt->getAttribute(pScrn, attribute, value);
             goto err;
         }
-
-        if ((pPPriv->XvV4LCtrl[i].qctrl.flags & V4L2_CTRL_FLAG_DISABLED)) {
-            ret = BadValue;
+        if (pPPriv->XvV4LCtrl[i].qctrl.flags & V4L2_CTRL_FLAG_DISABLED)
             goto err;
-        }
         ctrl.id = pPPriv->XvV4LCtrl[i].qctrl.id;
-        if (ioctl(V4L_FD, VIDIOC_G_CTRL, &ctrl))
-            ret = BadValue;
-        *value = v4l_to_xv(ctrl.value, &pPPriv->XvV4LCtrl[i]);
+        if (ioctl(V4L_FD, VIDIOC_G_CTRL, &ctrl) != -1) {
+            *value = ctrl.value;
+            ret = Success;
+        }
     }
-
     DEBUG(xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2, "Xv/GPA %d, %d\n",
         (int)attribute, (int)*value));
 
