@@ -92,22 +92,8 @@ v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
     }
 
     setupDone = TRUE;
-
-    /* Check that we're being loaded on a Linux system */
-    LoaderGetOS(&osname, NULL, NULL, NULL);
-    if (!osname || strcmp(osname, "linux") != 0) {
-        if (errmaj)
-            *errmaj = LDR_BADOS;
-        if (errmin)
-            *errmin = 0;
-        return NULL;
-    } else {
-        /* OK */
-
-        xf86AddDriver (&V4L, module, 0);
-
-        return (pointer)1;
-    }
+    xf86AddDriver (&V4L, module, 0);
+    return (pointer)1;
 }
 
 #else
