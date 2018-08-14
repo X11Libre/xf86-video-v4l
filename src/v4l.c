@@ -1137,7 +1137,6 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
         pPPriv->nr = d;
 
         /* check device capabilities */
-        memset(&pPPriv->cap, 0, sizeof(&pPPriv->cap));
         if (-1 == ioctl(fd, VIDIOC_QUERYCAP, &pPPriv->cap) ||
             0 == (pPPriv->cap.capabilities & V4L2_CAP_VIDEO_OVERLAY)) {
             xf86Msg(X_ERROR, "v4l: %s: no overlay support\n",dev);
