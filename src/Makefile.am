@@ -30,4 +30,4 @@ v4l_drv_ladir = @moduledir@/drivers
 
 v4l_drv_la_SOURCES =	\
 	v4l.c		\
-	videodev.h
+	videodev2.h
