@@ -42,6 +42,10 @@
 # define DEBUG(x)
 #endif
 
+#ifndef VIDEO_INVERT_CLIPLIST
+#define VIDEO_INVERT_CLIPLIST 0x00000002
+#endif
+
 /***************************************************************************/
 
 static void     V4LIdentify(int flags);
