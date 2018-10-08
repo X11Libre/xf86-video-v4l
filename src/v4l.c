@@ -769,12 +769,15 @@ V4lSetPortAttribute(ScrnInfoPtr pScrn,
     } else if (attribute == xvFreq) {
         struct v4l2_frequency   freq;
         memset(&freq, 0, sizeof(freq));
-        ioctl(V4L_FD, VIDIOC_G_FREQUENCY, &freq);
-        freq.frequency = value;
-        if (ioctl(V4L_FD, VIDIOC_S_FREQUENCY, &freq) == -1)
-            xf86Msg(X_ERROR, "v4l: Error %d while setting frequency\n", errno);
-        else
-            ret = Success;
+        if (ioctl(V4L_FD, VIDIOC_G_FREQUENCY, &freq) == -1) {
+            xf86Msg(X_ERROR, "v4l: Error %d while getting frequency\n", errno);
+        } else {
+            freq.frequency = value;
+            if (ioctl(V4L_FD, VIDIOC_S_FREQUENCY, &freq) == -1)
+                xf86Msg(X_ERROR, "v4l: Error %d while setting frequency\n", errno);
+            else
+                ret = Success;
+        }
     } else {
         for (i = 0; i < pPPriv->n_qctrl; i++)
             if (pPPriv->XvV4LCtrl[i].xv == attribute)
