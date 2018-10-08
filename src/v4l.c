@@ -188,7 +188,7 @@ static const XF86AttributeRec FreqAttr =
 static struct V4L_DEVICE {
     int  fd;
     int  useCount;
-    char devName[16];
+    char devName[18];
 } v4l_devices[MAX_V4L_DEVICES] = {
     { -1 },
     { -1 },
@@ -1157,7 +1157,8 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
         }
 
         xf86Msg(X_INFO, "v4l: enabling overlay mode for %s.\n", dev);
-        strncpy(V4L_NAME, dev, 16);
+        strncpy(V4L_NAME, dev, 18);
+        V4L_NAME[17] = '\0';
         V4LBuildEncodings(pPPriv, fd);
         if (NULL == pPPriv->enc)
             return FALSE;
