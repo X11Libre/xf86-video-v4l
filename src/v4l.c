@@ -86,7 +86,6 @@ _X_EXPORT XF86ModuleData v4lModuleData = { &v4lVersRec, v4lSetup, NULL };
 static pointer
 v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
 {
-    const char *osname;
     static Bool setupDone = FALSE;
 
     if (setupDone) {
