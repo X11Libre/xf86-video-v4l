@@ -1120,6 +1120,7 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
     XF86VideoAdaptorPtr *VAR = NULL;
     char dev[18];
     int  fd,i,j,d;
+    void *tmp;
 
     for (i = 0, d = 0; d < MAX_V4L_DEVICES; d++) {
         sprintf(dev, "/dev/video%d", d);
@@ -1164,7 +1165,11 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
             return FALSE;
 
         /* alloc VideoAdaptorRec */
-        VAR = realloc(VAR,sizeof(XF86VideoAdaptorPtr)*(i+1));
+        tmp = realloc(VAR,sizeof(XF86VideoAdaptorPtr)*(i+1));
+        if (!tmp)
+            return FALSE;
+        VAR = tmp;
+
         VAR[i] = malloc(sizeof(XF86VideoAdaptorRec));
         if (!VAR[i])
             return FALSE;
