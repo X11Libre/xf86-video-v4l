@@ -109,7 +109,7 @@ v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
 #define VIDEO_OFF     0  /* really off */
 #define VIDEO_RGB     1  /* rgb overlay (directly to fb) */
 #define VIDEO_YUV     2  /* yuv overlay (to offscreen memory + hw scaling) */
-#define VIDEO_RECLIP  3  /* temporarly off, window clipping changes */
+#define VIDEO_RECLIP  3  /* temporarily off, window clipping changes */
 
 typedef struct _XvV4LCtrlRec {
     struct v4l2_queryctrl       qctrl;
@@ -1194,7 +1194,7 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
 
         /* Initialize yuv_format */
         if (0 != pPPriv->yuv_format) {
-            /* pass throuth scaler attributes */
+            /* pass through scaler attributes */
             for (j = 0; j < pPPriv->myfmt->num_attributes; j++) {
                 v4l_add_attr(&VAR[i]->pAttributes, &VAR[i]->nAttributes,
                              pPPriv->myfmt->attributes+j);
