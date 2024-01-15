@@ -59,7 +59,10 @@ XORG_DRIVER_CHECK_EXT(XV, videoproto)
 # Obtain compiler/linker options for the driver dependencies
 PKG_CHECK_MODULES(XORG, [xorg-server >= 1.0.99.901 xproto $REQUIRED_MODULES])
 
-# Checks for libraries.
+# Checks for library functions
+# We don't use strlcat or strlcpy, but check to quiet a -Wredundant-decls warning
+# from xorg/os.h which will otherwise redefine it.
+AC_CHECK_FUNCS([strlcat strlcpy])
 
 AC_SUBST([moduledir])
 
