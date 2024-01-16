@@ -908,16 +908,23 @@ static int
 AddV4LEnc(XF86VideoEncodingPtr enc, int entry,
             char *norm, char *input, int width, int height, int n, int d)
 {
-    enc->id     = entry;
-    enc->name   = malloc(strlen(norm) + strlen(input) + 2);
-    if (!enc->name)
+    char *name;
+
+#if ABI_VIDEODRV_VERSION >= SET_ABI_VERSION(10, 0)
+    if (Xasprintf(&name, "%s-%s", norm, fixname(input)) < 0)
+        name = NULL;
+#else
+    name = Xprintf("%s-%s", norm, fixname(input));
+#endif
+    if (name == NULL)
         return -1;
 
+    enc->id     = entry;
+    enc->name   = name;
     enc->width  = width;
     enc->height = height;
     enc->rate.numerator   = n;
     enc->rate.denominator = d * 2; /* Refresh rate is twice, due to interlace */
-    sprintf(enc->name,"%s-%s",norm,fixname(input));
 
     xf86Msg(X_INFO, "v4l: adding input %s, %dx%d %d fps\n",
             enc->name, enc->width, enc->height, (d + n - 1)/n);
