@@ -910,12 +910,8 @@ AddV4LEnc(XF86VideoEncodingPtr enc, int entry,
 {
     char *name;
 
-#if ABI_VIDEODRV_VERSION >= SET_ABI_VERSION(10, 0)
     if (Xasprintf(&name, "%s-%s", norm, fixname(input)) < 0)
         name = NULL;
-#else
-    name = Xprintf("%s-%s", norm, fixname(input));
-#endif
     if (name == NULL)
         return -1;
 
