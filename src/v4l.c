@@ -5,10 +5,7 @@
  * Copyright (c) 2011 Mauro Carvalho Chehab <mchehab@redhat.com> for:
  *	- Major rewrite, as driver got ported to V4L2 API
  */
-
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
