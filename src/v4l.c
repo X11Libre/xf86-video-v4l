@@ -64,8 +64,6 @@ _X_EXPORT DriverRec V4L = {
     .driverFunc = NULL,   /* FIXME: Need to implement for new probing mode */
 };
 
-#ifdef XFree86LOADER
-
 static MODULESETUPPROTO(v4lSetup);
 
 static XF86ModuleVersionInfo v4lVersRec =
@@ -99,13 +97,6 @@ v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
     xf86AddDriver (&V4L, module, 0);
     return (pointer)1;
 }
-
-#else
-
-#include <fcntl.h>
-#include <sys/ioctl.h>
-
-#endif
 
 #define VIDEO_OFF     0  /* really off */
 #define VIDEO_RGB     1  /* rgb overlay (directly to fb) */
