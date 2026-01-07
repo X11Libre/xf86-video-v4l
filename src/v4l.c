@@ -82,8 +82,8 @@ static XF86ModuleVersionInfo v4lVersRec =
 
 _X_EXPORT XF86ModuleData v4lModuleData = { &v4lVersRec, v4lSetup, NULL };
 
-static pointer
-v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
+static void*
+v4lSetup(void *module, void *opts, int *errmaj, int *errmin)
 {
     static Bool setupDone = FALSE;
 
@@ -95,7 +95,7 @@ v4lSetup(pointer module, pointer opts, int *errmaj, int *errmin)
 
     setupDone = TRUE;
     xf86AddDriver (&V4L, module, 0);
-    return (pointer)1;
+    return (void*)1;
 }
 
 #define VIDEO_OFF     0  /* really off */
@@ -403,7 +403,7 @@ static int V4lOpenDevice(PortPrivPtr pPPriv, ScrnInfoPtr pScrn)
         pPPriv->rgb_fbuf.fmt.width        = pScrn->virtualX;
         pPPriv->rgb_fbuf.fmt.height       = pScrn->virtualY;
         pPPriv->rgb_fbuf.fmt.bytesperline = pScrn->displayWidth * ((pScrn->bitsPerPixel + 7)/8);
-        pPPriv->rgb_fbuf.base             = (pointer)(pScrn->memPhysBase + pScrn->fbOffset);
+        pPPriv->rgb_fbuf.base             = pScrn->memPhysBase + pScrn->fbOffset;
         if (first) {
             xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
                            "v4l: memPhysBase=0x%lx\n", pScrn->memPhysBase);
@@ -449,7 +449,7 @@ static int
 V4lPutVideo(ScrnInfoPtr pScrn,
     short vid_x, short vid_y, short drw_x, short drw_y,
     short vid_w, short vid_h, short drw_w, short drw_h,
-    RegionPtr clipBoxes, pointer data, DrawablePtr pDraw)
+    RegionPtr clipBoxes, void *data, DrawablePtr pDraw)
 {
     struct v4l2_format fmt;
 
@@ -510,7 +510,7 @@ V4lPutVideo(ScrnInfoPtr pScrn,
             pPPriv->yuv_fbuf.fmt.bytesperline = pPPriv->surface->pitches[0];
             pPPriv->yuv_fbuf.fmt.pixelformat = pPPriv->yuv_format;
             pPPriv->yuv_fbuf.base         =
-                (pointer)(pScrn->memPhysBase + pPPriv->surface->offsets[0]);
+                (pScrn->memPhysBase + pPPriv->surface->offsets[0]);
             DEBUG(xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
                                  "  surface: %p+%d = %p, %dx%d, pitch %d\n",
                                 (void *)pScrn->memPhysBase, pPPriv->surface->offsets[0],
@@ -681,7 +681,7 @@ static int
 V4lPutStill(ScrnInfoPtr pScrn,
     short vid_x, short vid_y, short drw_x, short drw_y,
     short vid_w, short vid_h, short drw_w, short drw_h,
-    RegionPtr clipBoxes, pointer data, DrawablePtr pDraw)
+    RegionPtr clipBoxes, void *data, DrawablePtr pDraw)
 {
 #if 0
     PortPrivPtr pPPriv = (PortPrivPtr) data;
@@ -694,7 +694,7 @@ V4lPutStill(ScrnInfoPtr pScrn,
 }
 
 static void
-V4lStopVideo(ScrnInfoPtr pScrn, pointer data, Bool shutdown)
+V4lStopVideo(ScrnInfoPtr pScrn, void *data, Bool shutdown)
 {
     PortPrivPtr pPPriv = (PortPrivPtr) data;
     int zero=0;
@@ -731,7 +731,7 @@ V4lStopVideo(ScrnInfoPtr pScrn, pointer data, Bool shutdown)
 
 static int
 V4lSetPortAttribute(ScrnInfoPtr pScrn,
-    Atom attribute, INT32 value, pointer data)
+    Atom attribute, INT32 value, void *data)
 {
     struct v4l2_control ctrl;
     PortPrivPtr pPPriv = (PortPrivPtr) data;
@@ -797,7 +797,7 @@ err:
 
 static int
 V4lGetPortAttribute(ScrnInfoPtr pScrn,
-    Atom attribute, INT32 *value, pointer data)
+    Atom attribute, INT32 *value, void *data)
 {
     struct v4l2_control ctrl;
     PortPrivPtr pPPriv = (PortPrivPtr) data;
@@ -852,7 +852,7 @@ err:
 static void
 V4lQueryBestSize(ScrnInfoPtr pScrn, Bool motion,
     short vid_w, short vid_h, short drw_w, short drw_h,
-    unsigned int *p_w, unsigned int *p_h, pointer data)
+    unsigned int *p_w, unsigned int *p_h, void *data)
 {
     PortPrivPtr pPPriv = (PortPrivPtr) data;
     int maxx = pPPriv->enc[pPPriv->cenc].width;
@@ -1203,7 +1203,7 @@ V4LInit(ScrnInfoPtr pScrn, XF86VideoAdaptorPtr **adaptors)
         if (!Private)
             return FALSE;
         memset(Private,0,sizeof(DevUnion));
-        Private->ptr = (pointer)pPPriv;
+        Private->ptr = pPPriv;
         VAR[i]->pPortPrivates = Private;
         VAR[i]->nPorts = 1;
 
