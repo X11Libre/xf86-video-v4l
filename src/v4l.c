@@ -11,30 +11,19 @@
 #define _GNU_SOURCE
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <ctype.h>
-
-#include <fcntl.h>
 #include <errno.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
+#include <X11/extensions/Xv.h>
 
-#include "videodev2.h"
 #include "xf86.h"
-#include "xf86_OSproc.h"
-#include "xf86Pci.h"
 #include "xf86fbman.h"
 #include "xf86xv.h"
-#include <X11/extensions/Xv.h>
-#include "regionstr.h"
-#include "dgaproc.h"
-#include "xf86str.h"
 #include "fourcc.h"
 
-#include <asm/ioctl.h>          /* _IORW(xxx) #defines are here */
+#include "videodev2.h"
+
 
 #if 0
 # define DEBUG(x) (x)
