@@ -3,7 +3,7 @@
  *  based on Michael Schimek's permedia 2 driver.
  *
  * Copyright (c) 2011 Mauro Carvalho Chehab <mchehab@redhat.com> for:
- *	- Major rewrite, as driver got ported to V4L2 API
+ * - Major rewrite, as driver got ported to V4L2 API
  */
 #include "config.h"
 
@@ -143,8 +143,7 @@ typedef struct _PortPrivRec {
 
 static Atom xvEncoding, xvFreq;
 
-static XF86VideoFormatRec
-InputVideoFormats[] = {
+static XF86VideoFormatRec InputVideoFormats[] = {
     { 15, TrueColor },
     { 16, TrueColor },
     { 24, TrueColor },
@@ -176,8 +175,6 @@ static struct V4L_DEVICE {
     { -1 },
 };
 
-/* ---------------------------------------------------------------------- */
-
 static int SetV4LFmt(int fd, CARD32 pixelformat)
 {
     struct v4l2_framebuffer fbuf;
@@ -200,6 +197,7 @@ static int SetV4LFmt(int fd, CARD32 pixelformat)
                   p[0], p[1], p[2], p[3]));
     return 0;
 }
+
 static int GetV4LFmt(int fd, CARD32 *pixelformat)
 {
     struct v4l2_framebuffer fbuf;
@@ -221,7 +219,6 @@ static int AddControl(PortPrivPtr p, XF86AttributeRec **list, int *count,
 {
     char *ptr;
 
-/* v4l_add_attr */
     if (qctrl->flags & V4L2_CTRL_FLAG_DISABLED)
         return 0;
     switch (qctrl->type) {
@@ -977,13 +974,13 @@ V4LBuildEncodings(PortPrivPtr p, int fd)
         for (std = 0; std < num_std; std++) {
             int width, height;
 
-	    /*
-	     * Currently, this code is not reliable, due to driver
-	     * non-compliance on both saa7134 and bttv. So, instead,
-	     * just use the video standard information
-	     */
+        /*
+         * Currently, this code is not reliable, due to driver
+         * non-compliance on both saa7134 and bttv. So, instead,
+         * just use the video standard information
+         */
 #if 0
-	    struct v4l2_framebuffer fbuf;
+            struct v4l2_framebuffer fbuf;
 
             /* Some webcam drivers will fail here, but that's OK */
             ioctl(fd, VIDIOC_S_STD, &p->standard[std].id);
@@ -1019,13 +1016,13 @@ V4LBuildEncodings(PortPrivPtr p, int fd)
                 }
             }
 #else
-	    if (p->standard[std].id & V4L2_STD_525_60) {
-		height = 480;
-		width = 640;
-	    } else {
-		height = 576;
-		width = 768;
-	    }
+            if (p->standard[std].id & V4L2_STD_525_60) {
+                height = 480;
+                width = 640;
+            } else {
+                height = 576;
+                width = 768;
+            }
 
 #endif
             /* Fixup for some driver bug */
