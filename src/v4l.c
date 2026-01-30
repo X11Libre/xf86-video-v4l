@@ -165,10 +165,10 @@ InputVideoFormats[] = {
 #define V4L_ATTR (sizeof(Attributes) / sizeof(XF86AttributeRec))
 
 static const XF86AttributeRec Attributes[] = {
-    {XvSettable | XvGettable, -1000,    1000, XV_ENCODING},
+    {XvSettable | XvGettable, -1000,    1000, (char*)XV_ENCODING},
 };
 static const XF86AttributeRec FreqAttr =
-    {XvSettable | XvGettable,     0, 16*1000, XV_FREQ};
+    {XvSettable | XvGettable,     0, 16*1000, (char*)XV_FREQ};
 
 
 #define MAX_V4L_DEVICES 4
