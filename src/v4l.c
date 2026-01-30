@@ -402,7 +402,7 @@ static int V4lOpenDevice(PortPrivPtr pPPriv, ScrnInfoPtr pScrn)
         pPPriv->rgb_fbuf.fmt.width        = pScrn->virtualX;
         pPPriv->rgb_fbuf.fmt.height       = pScrn->virtualY;
         pPPriv->rgb_fbuf.fmt.bytesperline = pScrn->displayWidth * ((pScrn->bitsPerPixel + 7)/8);
-        pPPriv->rgb_fbuf.base             = pScrn->memPhysBase + pScrn->fbOffset;
+        pPPriv->rgb_fbuf.base             = (void*)(pScrn->memPhysBase + pScrn->fbOffset);
         if (first) {
             xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
                            "v4l: memPhysBase=0x%lx\n", pScrn->memPhysBase);
@@ -507,9 +507,9 @@ V4lPutVideo(ScrnInfoPtr pScrn,
             pPPriv->yuv_fbuf.fmt.width        = pPPriv->surface->width;
             pPPriv->yuv_fbuf.fmt.height       = pPPriv->surface->height;
             pPPriv->yuv_fbuf.fmt.bytesperline = pPPriv->surface->pitches[0];
-            pPPriv->yuv_fbuf.fmt.pixelformat = pPPriv->yuv_format;
-            pPPriv->yuv_fbuf.base         =
-                (pScrn->memPhysBase + pPPriv->surface->offsets[0]);
+            pPPriv->yuv_fbuf.fmt.pixelformat  = pPPriv->yuv_format;
+            pPPriv->yuv_fbuf.base             =
+                (void*)(pScrn->memPhysBase + pPPriv->surface->offsets[0]);
             DEBUG(xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
                                  "  surface: %p+%d = %p, %dx%d, pitch %d\n",
                                 (void *)pScrn->memPhysBase, pPPriv->surface->offsets[0],
