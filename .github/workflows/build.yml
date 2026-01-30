@@ -10,7 +10,7 @@ jobs:
     ubuntu:
         strategy:
             matrix:
-                xserver-version: [ master, xlibre-xserver-25.1.0, xlibre-xserver-25.0.0.18 ]
+                xserver-version: [ master, xlibre-xserver-25.1.1, xlibre-xserver-25.0.0.20 ]
         runs-on: ubuntu-latest
         steps:
             - uses: X11Libre/action-build-driver/target/ubuntu@v0.3.7
