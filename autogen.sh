@@ -12,4 +12,4 @@ cd $ORIGDIR || exit $?
 git config --local --get format.subjectPrefix >/dev/null 2>&1 ||
     git config --local format.subjectPrefix "PATCH xf86-video-v4l"
 
-$srcdir/configure --enable-maintainer-mode "$@"
+$srcdir/configure "$@"
