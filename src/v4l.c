@@ -57,6 +57,7 @@ static MODULESETUPPROTO(v4lSetup);
 #define V4L_VERSION_MAJOR	XLIBRE_MODULE_VERSION_MAJOR
 #define V4L_VERSION_MINOR	XLIBRE_MODULE_VERSION_MINOR
 #define V4L_VERSION_PATCH	XLIBRE_MODULE_VERSION_PATCH
+#define V4L_VERSION_SUFFIX	PACKAGE_VERSION_SUFFIX
 
 static XF86ModuleVersionInfo v4lVersRec =
 {
@@ -73,6 +74,10 @@ static XF86ModuleVersionInfo v4lVersRec =
 };
 
 _X_EXPORT XF86ModuleData v4lModuleData = { &v4lVersRec, v4lSetup, NULL };
+
+#ifdef XF86_MODULE_VERSION_SUFFIX
+XF86_MODULE_VERSION_SUFFIX(v4l, V4L_VERSION_SUFFIX);
+#endif
 
 static void*
 v4lSetup(void *module, void *opts, int *errmaj, int *errmin)
